@@ -18,7 +18,7 @@
       flex-direction: column;
       text-align: center;
       padding: 20px;
-      overflow-y: auto; /* biar bisa digeser */
+      overflow-y: auto;
     }
     #timeline::-webkit-scrollbar { width: 8px; }
     #timeline::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
@@ -50,6 +50,21 @@
     .gallery-container {display: grid; grid-template-columns: repeat(5, 1fr); grid-template-rows: repeat(3, auto); grid-gap: 10px; width:90%; margin-top:20px;}
     .gallery-item {width:100%; border-radius:10px; opacity:0; transform: translateY(-20px); transition: all 1s ease;}
     .gallery-item.active {opacity:1; transform: translateY(0);}
+
+    /* Tombol musik */
+    #music-btn {
+      position: fixed; 
+      top: 15px; 
+      right: 15px; 
+      z-index: 1000; 
+      background: rgba(255,255,255,0.2); 
+      border: none; 
+      padding: 10px 15px; 
+      border-radius: 8px; 
+      color: white; 
+      cursor: pointer;
+      font-size: 14px;
+    }
   </style>
 </head>
 <body>
@@ -57,6 +72,7 @@
 
   <!-- Musik Latar -->
   <audio id="bg-music" src="musik.mp3" loop></audio>
+  <button id="music-btn">⏸️</button>
 
   <!-- Halaman 1: Galaxy -->
   <section id="galaxy">
@@ -74,15 +90,15 @@
   <section id="timeline">
     <h2>Perjalanan Indah Tifany ❤️</h2>
     <div id="timeline-items">
-      <div class="timeline-item">Masa ketika kamu hidup sebagai embrio di dalam rahim, membentuk fondasi fisik dan emosional <br><img src="foto1.jpg"></div>
-      <div class="timeline-item">Masa dimana kamu belajar, pengalaman pertama terhadap semua yang kamu lakukan  <br><img src="foto2.jpg"></div>
-      <div class="timeline-item">Masa dimana kamu memulai eksplorasi, dan pembelajaran mengenai kehidupan di sekitar <br><img src="foto3.jpg"></div>
-      <div class="timeline-item">Masa dimana kamu mengalami pembentukan diri dan emosi yang lebih kompleks, awal mulanya kita menjalin hubungan dan mengalami patah hati bersama <br><img src="foto4.jpg"></div>
-      <div class="timeline-item">Masa sekarang yaitu masa kemandirian, dan perjuangan masa dimana kamu menjalin hubungan yang bahagia, berusaha saling membangun hubungan yang harmonis, dan serius <br><img src="foto5.jpg"></div>
+      <div class="timeline-item">Masa ketika kamu hidup sebagai embrio di dalam rahim... <br><img src="foto1.jpg"></div>
+      <div class="timeline-item">Masa dimana kamu belajar... <br><img src="foto2.jpg"></div>
+      <div class="timeline-item">Masa dimana kamu memulai eksplorasi... <br><img src="foto3.jpg"></div>
+      <div class="timeline-item">Masa dimana kamu mengalami pembentukan diri... <br><img src="foto4.jpg"></div>
+      <div class="timeline-item">Masa sekarang yaitu masa kemandirian... <br><img src="foto5.jpg"></div>
     </div>
   </section>
 
-  <!-- Halaman 2.5: Galeri Foto Bertahap -->
+  <!-- Halaman 2.5: Galeri Foto -->
   <section id="photo-gallery">
     <h2>Kenangan Manis Kamu ✨</h2>
     <div class="gallery-container">
@@ -127,8 +143,26 @@
     <p style="margin-top:20px; color:#ffcc88; font-style:italic; font-size:18px;">Tap lilinnya untuk meniup 🎂✨</p>
   </section>
 
+  <!-- Halaman 5: Video + Voice Note -->
+  <section id="video-section">
+    <h2>Pesan Terakhir Untukmu 💕</h2>
+    <video id="birthday-video" width="320" controls>
+      <source src="video.mp4" type="video/mp4">
+      Browser kamu tidak mendukung video.
+    </video>
+    <p style="margin-top:15px; font-style:italic;">Video kecil ini untuk menutup kejutan manis buatmu 🎥✨</p>
+
+    <!-- 🎤 Voice Note -->
+    <h3 style="margin-top:20px;">Ucapan Khusus Dari Aku 🎤</h3>
+    <audio id="voice-note" controls>
+      <source src="voice.m4a" type="audio/mp4">
+      <source src="voice.mp3" type="audio/mpeg">
+      Browser kamu tidak mendukung audio.
+    </audio>
+  </section>
+
   <script>
-    const sections = ["galaxy","timeline","photo-gallery","doa","cake-section"];
+    const sections = ["galaxy","timeline","photo-gallery","doa","cake-section","video-section"];
     let current = 0;
 
     const stars = document.getElementById("stars");
@@ -143,11 +177,28 @@
 
     document.getElementById(sections[0]).style.display="flex";
     const music = document.getElementById("bg-music");
+    const musicBtn = document.getElementById("music-btn");
+
+    // mulai musik otomatis dengan volume lebih kecil
+    music.volume = 0.5;
+    music.play().catch(()=>{}); 
+    musicBtn.textContent = "⏸️";
+
+    // tombol musik
+    musicBtn.addEventListener("click", ()=>{
+      if(music.paused){
+        music.play();
+        musicBtn.textContent = "⏸️";
+      } else {
+        music.pause();
+        musicBtn.textContent = "▶️";
+      }
+    });
 
     const galleryItems = document.querySelectorAll("#photo-gallery .gallery-item");
     function showGalleryItems(){
       galleryItems.forEach((item, index)=>{
-        setTimeout(()=>item.classList.add("active"), index * 1000); // 1 detik per foto
+        setTimeout(()=>item.classList.add("active"), index * 1000);
       });
     }
 
@@ -173,6 +224,20 @@
         if(nextSection==="photo-gallery"){
           showGalleryItems();
         }
+
+        if(nextSection==="video-section"){
+          document.getElementById("birthday-video").play();
+
+          // Musik fade out saat video dimulai
+          let fade = setInterval(()=>{
+            if(music.volume > 0.05){
+              music.volume -= 0.05;
+            } else {
+              music.volume = 0;
+              clearInterval(fade);
+            }
+          }, 300);
+        }
       }
     });
 
@@ -193,4 +258,3 @@
   </script>
 </body>
 </html>
-
